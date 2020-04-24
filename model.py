@@ -9,7 +9,7 @@ from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 from vocab import Vocab
 
 class BiLSTM(nn.Module):
-    def __init__(self, vocab, slot_vocab, embedding_dim=100, hidden_dim=256):
+    def __init__(self, vocab, slot_vocab, embedding_dim=100, hidden_dim=256,device = 0):
         super(BiLSTM, self).__init__()
         self.embedding_dim = embedding_dim
         self.hidden_dim = hidden_dim
@@ -17,6 +17,7 @@ class BiLSTM(nn.Module):
         self.slot_vocab = slot_vocab
         self.tagset_size = len(slot_vocab.word2id)
         self.vocab = vocab
+        self.device = device
 
         self.word_embeds = nn.Embedding(self.vocab_size, embedding_dim)
         self.lstm = nn.LSTM(embedding_dim, hidden_dim // 2,
@@ -29,6 +30,7 @@ class BiLSTM(nn.Module):
 #         self.hidden = self.init_hidden()
         seq_lens = [len(s) for s in sentences]
         sents_tensor = self.vocab.to_input_tensor(sentences)
+        sents_tensor.to(self.device)
         #sents_tensor [len,b,embed]
         embeds = self.word_embeds(sents_tensor)
         embeds = pack_padded_sequence(embeds,seq_lens)
@@ -68,6 +70,7 @@ class BiLSTM(nn.Module):
         # Get the emission scores from the BiLSTM
         labels = self.slot_vocab.to_input_tensor(labels) # labels [len,b]
         labels = labels.t()
+        labels.to(self.device)
         lstm_feats = self._get_lstm_features(sentence)
         loss = self._calcu_loss(lstm_feats,labels)
         preds = self.predict_slot(lstm_feats) #[b,len]

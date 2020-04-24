@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 
 def get_data(file_name,p = 0.6,add_intent = False):
-    with open("../data/{}.train".format(file_name),'r') as f:
+    with open("./data/train_data/{}.train".format(file_name),'r') as f:
         lines = f.readlines()
 
     train_x = []

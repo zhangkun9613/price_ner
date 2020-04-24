@@ -12,7 +12,8 @@ vocab = Vocab.from_corpus(x_train)
 tag_vocab = Vocab.from_corpus(y_train)
 
 model = BiLSTM(vocab,tag_vocab,100, 256)
-
+torch.cuda.set_device(0)
+model.cuda()
 optimizer = optim.Adam(model.parameters(), lr=0.01)
 for epoch in range(3):
     for sents,labels in batch_iter(train_data,16):

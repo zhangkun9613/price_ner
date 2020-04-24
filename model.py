@@ -30,7 +30,7 @@ class BiLSTM(nn.Module):
 #         self.hidden = self.init_hidden()
         seq_lens = [len(s) for s in sentences]
         sents_tensor = self.vocab.to_input_tensor(sentences)
-        sents_tensor.to(self.device)
+        sents_tensor = sents_tensor.to(self.device)
         #sents_tensor [len,b,embed]
         embeds = self.word_embeds(sents_tensor)
         embeds = pack_padded_sequence(embeds,seq_lens)
@@ -70,7 +70,7 @@ class BiLSTM(nn.Module):
         # Get the emission scores from the BiLSTM
         labels = self.slot_vocab.to_input_tensor(labels) # labels [len,b]
         labels = labels.t()
-        labels.to(self.device)
+        labels = labels.to(self.device)
         lstm_feats = self._get_lstm_features(sentence)
         loss = self._calcu_loss(lstm_feats,labels)
         preds = self.predict_slot(lstm_feats) #[b,len]
